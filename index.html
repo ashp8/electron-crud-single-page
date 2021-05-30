@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Main Application</title>
+    <link rel="stylesheet" href="./node_modules/materialize-css/dist/css/materialize.css">
+    <script src="./node_modules/materialize-css/dist/js/materialize.js"></script>
+    <link rel="stylesheet" href="./node_modules/material-icons/css/material-icons.css"/>
+    <link rel="stylesheet" href="./assets/css/app.css"/>
+    <script defer src="./renderer.js"></script>
+</head>
+<body class="green lighten-5">
+    <div class="root" id="root">
+        <div class="titlebar white-text white card-panel col s12 green darken-4 center-align">
+            this is a div container
+        </div>
+        <div class="row actions">
+            <div class="input-field col s2">
+                <select>
+                    <option value="" disabled selected>Choose your option</option>
+                        <option value="credit">credit</option>
+                        <option value="debit">debit</option>
+                        <option value="institute">institute</option>
+                </select>
+            </div>
+            <div class="input-field col s2">
+                <select>
+                    i   <option value="" disabled selected>Choose your option</option>
+                        <option value="today">today</option>
+                        <option value="week">week</option>
+                        <option value="month">month</option>
+                </select>
+            </div>
+            <div class="col s1"></div>
+            <div class="input-field col s6">
+                <input placeholder="Search Here..." id="first_name2" type="text" class="validate">
+            </div>
+            <a class="btn-floating btn-large waves-effect waves-light red">  <i class="material-icons">search</i>
+            </a>
+        </div>
+        <div class="data" id="data">
+
+        </div>
+
+
+    </div> 
+    <script src="./assets/js/operation.js"></script>
+    
+    
+</body>
+</html>

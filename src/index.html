@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Main Application</title>
+    <link rel="stylesheet" href="../node_modules/materialize-css/dist/css/materialize.css">
+    <script src="../node_modules/materialize-css/dist/js/materialize.js"></script>
+    <link rel="stylesheet" href="../node_modules/material-icons/iconfont/material-icons.css"/>
+    <link rel="stylesheet" href="./assets/css/app.css"/>
+    <script defer src="./renderer.js"></script>
+</head>
+<body class="green lighten-5">
+    <div class="root" id="root">
+        <div class="titlebar white-text white card-panel col s12 green darken-4 center-align">
+            this is a div container
+        </div>
+        <div class="row actions">
+            <div class="input-field col s2">
+                <select id="mainSelect1">
+                    <option value="" disabled selected>Choose your option</option>
+                        <option value="credit">credit</option>
+                        <option value="debit">debit</option>
+                        <option value="all">ALL</option>
+                        <option value="institute">institute</option>
+                </select>
+            </div>
+            <div class="input-field col s2">
+                <select id="drange1" name="drange1">
+                       <option value="" disabled selected>Choose your option</option>
+                        <option value="today">today</option>
+                        <option value="week">week</option>
+                        <option value="month">month</option>
+                </select>
+            </div>
+            <div id="splaceholder" class=" input-field col s2"></div>
+            <div class="input-field col s5">
+                <input placeholder="Search Here..." id="search" type="text" class="validate">
+            </div>
+            <a id="searchbtn" style="margin-top: 10px;" class="btn btn-medium waves-effect waves-light green darken-1"><span style="margin: 5px 0 0 0;" class="material-icons">search</span>
+            </a>
+        </div>
+        <div class="data" id="data">
+
+        </div>
+        <div class="btnop">
+            <div class="row">
+                <div class="col s1"><button onclick="addOperation()" href="#modal1" id="addData" class="btn btn-medium waves-effect waves-light modal-trigger green darken-3" style="margin: 0 10px;">Add</button></div>
+                <div class="col s1"><button id="printbtn" class="btn btn-medium waves-effect waves-light  green darken-3"><span style="margin-top: 7px;" class="material-icons">print</span></button></div>
+                <div class="col s1"><button onclick="renderInstitute()" id="renderInstitute" class="btn btn-medium waves-effect waves-light  green darken-3">Institute</button></div>
+            </div>
+        </div>
+        
+
+
+    </div> 
+    
+    <div class="modal" id="modal1">
+        
+    </div>
+    <script src="./assets/js/operation.js"></script>
+    <script src="./assets/js/dbop.js"></script>
+    
+    
+</body>
+</html>

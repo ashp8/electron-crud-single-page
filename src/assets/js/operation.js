@@ -244,7 +244,7 @@ const getRow = async (types, search=null)=>{
                         <td class="tds">${a.description}</td>
                         <td>${entoBng(a.quantity === null ? null: a.quantity.toString())}</td>
                         <td>${entoBng(a.due === null? null: a.due.toString())}</td>
-                        <td>${a.type}</td>
+                        <td>${a.type === 'credit' ? "খরচ":"জমা"}</td>
                         <td class="tds">${inst === undefined ? null: inst.name}</td>
                         <td>${entoBng(a.ammount === null ? null: a.ammount.toString())}</td>
                         <td>${a.date}</td>
@@ -327,7 +327,7 @@ const addOperation = async ()=>{
     const cdinp = `
         <div id="addFSec">
             <div class="input-field col s12">
-                <input id="addinstid" list="brow" placeholder="Institute Name" class="input-field col s12">
+                <input id="addinstid" list="brow" placeholder="প্রতিষ্ঠানের নাম" class="input-field col s12">
                 <datalist id="brow">
                     <option value="Internet Explorer">
                     <option value="Firefox">
@@ -338,38 +338,38 @@ const addOperation = async ()=>{
             </div>
             <div class="input-field col s12">
                 <input id="adddescription" type="text"/>
-                <label for="adddescription">Description</label>
+                <label for="adddescription">বিবরণী</label>
             </div>
             <div class="input-field col s12">
                 <input id="addquantity" type="text" class="validate"/>
-                <label for="addquantity">Quantity</label>
+                <label for="addquantity">পরিমাণ</label>
             </div>
             <div class="input-field col s12">
                 <input id="addammount" type="text" class="validate"/>
-                <label for="addammount">Ammount</label>
+                <label for="addammount">টাকা</label>
             </div>
             <div class="input-field col s12">
                 <input id="adddue" type="text" class="validate"/>
-                <label for="adddue">Due</label>
+                <label for="adddue">পাওনা</label>
             </div>
             <div class="input-field col s12">
                 <input id="addcomment" type="text" class="validate"/>
-                <label for="addcomment">addcomment</label>
+                <label for="addcomment">মন্তব্য</label>
             </div>
         </div>
     `;
     const instinp = `
          <div class="input-field col s12">
                 <input id="instname" type="text" class="validate"/>
-                <label for="instname">Institue Name</label>
+                <label for="instname">প্রতিষ্ঠানের নাম</label>
             </div>
             <div class="input-field col s12">
                 <input id="instdetail" type="text" class="validate"/>
-                <label for="instdetail">Details</label>
+                <label for="instdetail">বিস্তারিত</label>
             </div>
             <div class="input-field col s12">
                 <input id="instcontacts" type="text" class="validate"/>
-                <label for="instcontacts">Contacts</label>
+                <label for="instcontacts">যোগাযোগ</label>
             </div>
     `;
     const addForm = `
@@ -378,9 +378,9 @@ const addOperation = async ()=>{
             <div class="row">
                 <div calss="col s12" style="padding: 0 10px;">
                     <select id="sInsSM">
-                            <option value="debit">debit</option>
-                            <option value="credit">credit</option>
-                            <option value="institute">institute</option>
+                            <option value="debit">জমা</option>
+                            <option value="credit">খরচ</option>
+                            <option value="institute">প্রতিষ্ঠান</option>
                     </select>
                 </div>
                 ${cdinp}
@@ -457,7 +457,7 @@ const editOperation = async (id)=>{
     const cdinp = `
         <div id="MEditform">
             <div class="input-field col s12">
-                <input value="${instName.name} $${instName.id}" id="editinstid" list="brow2" placeholder="Institute Name" class="input-field col s12">
+                <input value="${instName.name} $${instName.id}" id="editinstid" list="brow2" placeholder="প্রতিষ্ঠানের নাম ..." class="input-field col s12">
                 <datalist id="brow2">
                     <option value="Internet Explorer">
                     <option value="Firefox">
@@ -468,27 +468,27 @@ const editOperation = async (id)=>{
             </div>
             <div class="input-field col s12">
                 <input id="editdescription" value="${acccountinfo.description}" type="text" class="validate"/>
-                <label for="editdescription">Description</label>
+                <label for="editdescription">বিবরণী</label>
             </div>
             <div class="input-field col s12">
                 <input value="${acccountinfo.quantity}" id="editquantity" type="text" class="validate"/>
-                <label for="editquantity">Quantity</label>
+                <label for="editquantity">পরিমাণ</label>
             </div>
             <div class="input-field col s12">
                 <input value="${acccountinfo.ammount}" id="editammount" type="text" class="validate"/>
-                <label for="editammount">Ammount</label>
+                <label for="editammount">টাকা</label>
             </div>
             <div class="input-field col s12">
                 <input value="${acccountinfo.due}" id="editdue" type="text" class="validate"/>
-                <label for="editdue">Due</label>
+                <label for="editdue">পাওনা</label>
             </div>
             <div class="input-field col s12">
                 <input value="${acccountinfo.comment}"  id="editcomment" type="text" class="validate"/>
-                <label for="editcomment">Edit Comment</label>
+                <label for="editcomment">মন্তব্য</label>
             </div>
             <div class="input-field col s12">
                 <input value="${acccountinfo.date}"  id="editdate" type="text" class="validate"/>
-                <label for="editdate">Edit Date</label>
+                <label for="editdate">তারিখ</label>
             </div>
         </div>
     `;
@@ -498,9 +498,9 @@ const editOperation = async (id)=>{
             <div class="row">
                 <div calss="col s12" style="padding: 0 10px;">
                     <select id="edittypeSelect">
-                            <option value="${acccountinfo.type}">${acccountinfo.type}</option>
-                            <option value="debit">debit</option>
-                            <option value="credit">credit</option>
+                            <option value="${acccountinfo.type}">${acccountinfo.type === 'credit' ? 'খরচ':'জমা'}</option>
+                            <option value="debit">জমা</option>
+                            <option value="credit">খরচ</option>
                     </select>
                 </div>
                 ${cdinp}
@@ -616,7 +616,6 @@ const getAccountInfo = (id)=>{
 
 
 const updateAccount = (data, id)=>{
-    console.log(data, id);
     const sql = `update accounts set 
         description="${data.editdescription}",
         quantity=${data.editquantity},
@@ -727,9 +726,11 @@ const getAll = async (date)=>{
             sql = `select * from accounts`;
         }
         else if(isDateFormat(date) && sdate.value === ''){
-            sql = `select * from accounts where date="${date}"`;
+            date = date.replaceAll('x', '');
+            sql = `select * from accounts where date like "%${date}%"`;
         }else if(sdate.value !== ''){
-            sql = `select institute.name, accounts.id, accounts.description, accounts.quantity, accounts.ammount, accounts.due, accounts.type, accounts.date from institute inner join accounts on institute.id=accounts.instid where accounts.date="${sdate.value}" and institute.name like "%${date}%";`
+            sdate = sdate.replaceAll('x', '');
+            sql = `select institute.name, accounts.id, accounts.description, accounts.quantity, accounts.ammount, accounts.due, accounts.type, accounts.date from institute inner join accounts on institute.id=accounts.instid where accounts.date like "%${sdate.value}%" and institute.name like "%${date}%";`
         }else{
            sql = `select institute.name, accounts.id, accounts.description, accounts.quantity, accounts.ammount, accounts.due, accounts.type, accounts.date from institute inner join accounts on institute.id=accounts.instid where institute.name like "%${date}%";`
         }
@@ -829,8 +830,21 @@ function printMe(query){
   myframe.style.position = "absolute";
   myframe.style.top = "-10000px";
   document.body.appendChild(myframe);
-  myframe.contentDocument.write(this.innerHTML) ;
-  console.log(myframe)
+  let top = document.createElement('div');
+  top.innerHTML = `
+    <div style="font-size: 32px;" class="titlebar white-text white col s12 green darken-3 center-align">
+    <p style="font-size: 15px;">বিসমিল্লাহির রহমানির রহিম</p>
+    মেসার্স শান্তা এন্টারপ্রাইজ
+    <p style="text-align: end; font-size:12px;">
+      প্রোঃ মোঃ শাহিন হোসেন<br>
+      পদ্মা মোড়, বি আই ডি সি রোড, কাশিপুর, খালিশপুর, খুলনা</p>
+    </div>
+    <p>Search Result: ${document.querySelector('#search').value}</p>
+    <p>Search Date: ${document.querySelector('#sdate').value}</p>
+    ${this.innerHTML}
+  `;
+  myframe
+  myframe.contentDocument.write(top.innerHTML) ;
   myframe.contentDocument.querySelector('table').border = "1px solid black";
   myframe.contentDocument.querySelector('table').style.borderCollapse = "collapse";
   myframe.contentDocument.querySelector('table').style.width = "100%";

@@ -1,25 +1,23 @@
-*{
-    box-sizing: border-box;
-    margin: 0;
-    padding:0;
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
-.titlebar{
-    border: 1px solid gray;
-    font-size: 15px;
+.titlebar {
+  border: 1px solid gray;
 }
-.actions{
-    background-color: aliceblue;
+.actions {
+  background-color: aliceblue;
 }
-.data{
-    margin: 0 20px;
-    padding: 2%;
-    background-color: white;
-    max-height: 400px;
-    overflow: scroll;
+.data {
+  margin: 0 20px;
+  padding: 2%;
+  background-color: white;
+  max-height: 400px;
+  overflow: scroll;
 }
 
 .data::-webkit-scrollbar {
-  display: none;
 }
 #modal1::-webkit-scrollbar {
   display: none;

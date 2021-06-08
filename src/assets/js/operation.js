@@ -1,7 +1,26 @@
 
-const {app} = require('electron');
-const { rmSync } = require('original-fs');
 const sqlite3 = require('sqlite3');
+
+const entoBng = (bn)=>{
+    if(bn === null) return null;
+    let cengn = '';
+    const b2e = {
+        '1':'১',
+        '2':'২',
+        '3':'৩',
+        '4':'৪',
+        '5':'৫',
+        '6':'৬',
+        '7':'৭',
+        '8':'৮',
+        '9':'৯',
+        '0':'০',
+    };
+    for(let i = 0; i < bn.length; i++){
+        cengn += b2e[bn[i]];
+    }
+    return cengn;
+}
 
 const db = new sqlite3.Database('db.sqlite3', (err)=>{
     if(err){
@@ -41,7 +60,7 @@ const dothis = async (id)=>{
     let datas = { };
     document.querySelector('#updateaccount').addEventListener('click', ()=>{
         datas.type = selem.options[selem.selectedIndex].value;
-        let inputs = ["editcomment", "editdue", "editammount", 'editquantity', 'editdescription', 'editinstid'];
+        let inputs = ["editcomment", "editdue", "editammount", 'editquantity', 'editdescription', 'editinstid', 'editdate'];
             inputs.forEach(ids =>{
                 let inp = document.querySelector(`#${ids}`);
                 if(inp.value === "" || inp.value === undefined || inp.value === null){
@@ -50,10 +69,15 @@ const dothis = async (id)=>{
                     datas[inp.id] = inp.value;     
                 }
             });
+            datas.editdate = BdateToEng(datas.editdate);
+            datas.editdue =  isBengaliNumber(datas.editdue)? bntoEng(datas.editdue): parseInt(datas.editdue);
+            datas.editammount =  isBengaliNumber(datas.editammount)? bntoEng(datas.editammount): parseInt(datas.editammount);
+            datas.editquantity =  isBengaliNumber(datas.editquantity)? bntoEng(datas.editquantity): parseInt(datas.editquantity);
             datas.editdue =  isNaN(datas.editdue)? null:datas.editdue ;
             datas.editammount =  isNaN(datas.editammount)? null:datas.editammount ;
             datas.editquantity =  isNaN(datas.editquantity)? null:datas.editquantity ;
             datas.editinstid =  isNaN(parseinstId(datas.editinstid))? null:parseinstId(datas.editinstid);
+            // console.log(datas);
             updateAccount(datas, id);
         
     });
@@ -140,62 +164,74 @@ const getRow = async (types, search=null)=>{
     let thead = `
         <thead>
           <tr>
-              <th>SL No</th>
-              <th>Description</th>
-              <th>Quantity</th>
-              <th>Due</th>
-              <th>type</th>
-              <th>Institution Name</th>
-              <th>Ammount</th>
-              <th>Date</th>
+              <th>ক্রমিক নং</th>
+              <th>জমা বিবরণী</th>
+              <th>পরিমাণ</th>
+              <th>পাওনা</th>
+              <th>ধরন</th>
+              <th>প্রতিষ্ঠানের নাম</th>
+              <th>মূল্য</th>
+              <th>তারিখ</th>
               <th></th>
           </tr>
         </thead> 
     `;
     let str = "";
-    let sql;
+    let sql = "select * from accounts";
     if(types === 'credit'){
-        if(isDateFormat(search)){
-            sql = `select * from institute inner join accounts on institute.id=accounts.instid where accounts.type="credit" and accounts.date like '%${search}%'`;
-        }else{
-            sql = search === null ? 'select * from institute inner join accounts on institute.id=accounts.instid where accounts.type="credit"': `select institute.name, accounts.id, accounts.description, accounts.quantity, accounts.ammount, accounts.due, accounts.type, accounts.date from institute inner join accounts on institute.id=accounts.instid where type="credit" and institute.name like "%${search}%"`;
+        
+        sql = `select * from accounts where type='credit'`;
+        if(search === null){
+            sql = `select * from accounts where type='credit'`;
+        }
+        else if(isDateFormat(search)){
+            sql = `select * from accounts where type='credit' and date='${search}'`;
+        //     // sql = `select * from institute inner join accounts on institute.id=accounts.instid where accounts.type="credit" and accounts.date like '%${search}%'`;
+        }
+        else{
+        //     sql = "select * from accounts where type='credit'";
+            sql = `select accounts.instid, institute.name, accounts.id, accounts.description, accounts.quantity, accounts.ammount, accounts.due, accounts.type, accounts.date from institute inner join accounts on institute.id=accounts.instid where type="credit" and institute.name like "%${search}%"`;
         }
     }else if(types === 'debit'){
-        if(isDateFormat(search)){
-            sql = `select * from institute inner join accounts on institute.id=accounts.instid where accounts.type="debit" and accounts.date like '%${search}%'`;
+        sql = `select * from accounts where type='debit'`;
+        if(search === null){
+            sql = `select * from accounts where type='debit'`;
+        }
+        else if(isDateFormat(search)){
+            sql = `select * from accounts where type='debit' and date='${search}'`;
         }else{
-        // sql = 'select * from accounts where type="debit"';
-            sql = search === null ? 'select * from institute inner join accounts on institute.id=accounts.instid where accounts.type="debit"': `select institute.name, accounts.id, accounts.description, accounts.quantity, accounts.ammount, accounts.due, accounts.type, accounts.date from institute inner join accounts on institute.id=accounts.instid where type="credit" and institute.name like "%${search}%"`;
-        };
+            sql = `select accounts.instid, institute.name, accounts.id, accounts.description, accounts.quantity, accounts.ammount, accounts.due, accounts.type, accounts.date from institute inner join accounts on institute.id=accounts.instid where type="debit" and institute.name like "%${search}%"`;
+        }
     }else if(types === 'institute'){
         sql = 'select * from institute';
         thead = `
         <thead>
           <tr>
-              <th>SL No</th>
-              <th>Name</th>
-              <th>Details</th>
-              <th>Contacts</th>
+              <th>ক্রমিক নং</th>
+              <th>প্রতিষ্ঠানের নাম</th>
+              <th>বিবরণী</th>
+              <th>যোগাযোগ</th>
               <th></th>
           </tr>
         </thead> 
     `;
     }
     else if(types === 'all'){
-        // sql = 'select * from accounts';
-        sql=`select * from institute inner join accounts on institute.id=accounts.instid`;
+        sql = 'select * from accounts';
+        // sql=`select * from institute inner join accounts on institute.id=accounts.instid`;
     }else{
         // sql = 'select * from accounts';
-        sql=`select * from institute inner join accounts on institute.id=accounts.instid`;
+        // sql=`select * from institute inner join accounts on institute.id=accounts.instid`;
     }
     return new Promise((resolve, reject)=>{
-    db.all(sql,[], (err, row)=>{
+    db.all(sql,[], async (err, row)=>{
             if(row){
-                console.log(row);
-                row.forEach((a, index)=>{
+                const instname = await getIntituteNameId();
+                row.forEach(async (a, index)=>{
+                    const inst = instname.find(n=> n.id === a.instid);
                     if(types === 'institute'){
                         str+=`<tr>
-                        <td>${index}</td>
+                        <td>${ entoBng((index+1).toString())}</td>
                         <td class="tds">${a.name}</td>
                         <td>${a.details}</td>
                         <td>${a.contacts}</td>
@@ -204,13 +240,13 @@ const getRow = async (types, search=null)=>{
                     }
                     else{
                     str+=`<tr>
-                        <td>${index}</td>
+                        <td>${entoBng((index+1).toString())}</td>
                         <td class="tds">${a.description}</td>
-                        <td>${a.quantity}</td>
-                        <td>${a.due}</td>
+                        <td>${entoBng(a.quantity === null ? null: a.quantity.toString())}</td>
+                        <td>${entoBng(a.due === null? null: a.due.toString())}</td>
                         <td>${a.type}</td>
-                        <td class="tds">${a.name}</td>
-                        <td>${a.ammount}</td>
+                        <td class="tds">${inst === undefined ? null: inst.name}</td>
+                        <td>${entoBng(a.ammount === null ? null: a.ammount.toString())}</td>
                         <td>${a.date}</td>
                         <td style="table-layout:fixed;width:20px;overflow:hidden;"><button href="#modal1" onclick="dothis(${a.id})" class="btn btn-small waves-effect waves-light cyan modal-trigger">c</button></td>
                         </tr>`;
@@ -386,7 +422,6 @@ const addOperation = async ()=>{
         }else if(datas.type === '' || datas.type === 'credit' || datas.type === 'debit'){
             inputs = ["addcomment", "adddue", "addammount", 'addquantity', 'adddescription', 'addinstid'];
             if(datas.type === ''){
-                alert('selected value is debit by default');
                 datas.type = "debit";
             }
             inputs.forEach(ids =>{
@@ -397,6 +432,9 @@ const addOperation = async ()=>{
                     datas[inp.id] = inp.value;     
                 }
             });
+            datas.adddue =  isBengaliNumber(datas.adddue)? bntoEng(datas.adddue): parseInt(datas.adddue);
+            datas.addammount =  isBengaliNumber(datas.addammount)? bntoEng(datas.addammount): parseInt(datas.addammount);
+            datas.addquantity =  isBengaliNumber(datas.addquantity)? bntoEng(datas.addquantity): parseInt(datas.addquantity);
             datas.adddue =  isNaN(datas.adddue)? null:datas.adddue ;
             datas.addammount =  isNaN(datas.addammount)? null:datas.addammount ;
             datas.addquantity =  isNaN(datas.addquantity)? null:datas.addquantity ;
@@ -446,7 +484,11 @@ const editOperation = async (id)=>{
             </div>
             <div class="input-field col s12">
                 <input value="${acccountinfo.comment}"  id="editcomment" type="text" class="validate"/>
-                <label for="editcomment">addcomment</label>
+                <label for="editcomment">Edit Comment</label>
+            </div>
+            <div class="input-field col s12">
+                <input value="${acccountinfo.date}"  id="editdate" type="text" class="validate"/>
+                <label for="editdate">Edit Date</label>
             </div>
         </div>
     `;
@@ -571,6 +613,8 @@ const getAccountInfo = (id)=>{
     });
 };
 
+
+
 const updateAccount = (data, id)=>{
     console.log(data, id);
     const sql = `update accounts set 
@@ -580,6 +624,7 @@ const updateAccount = (data, id)=>{
         due=${data.editdue},
         instid=${data.editinstid},
         type="${data.type}",
+        date="${data.editdate}",
         comment="${data.editcomment}" where id=${id}`;
     db.run(sql, async (err)=>{
         if(err){
@@ -628,7 +673,6 @@ const deleteInstitute = (id)=>{
 }
 
 const renderByDebit = ()=>{
-    console.log("function called");
     const mainSelect1 = document.querySelector('#mainSelect1');
     mainSelect1.addEventListener('change', async ()=>{
         let value = mainSelect1.options[mainSelect1.selectedIndex].value;
@@ -641,11 +685,11 @@ const renderByDebit = ()=>{
         let value = mainSelect1.options[mainSelect1.selectedIndex].value;
         if(value === 'all'){
             const dataM = document.querySelector('#data');
-            dataM.innerHTML = await getAll(search.value);
+            dataM.innerHTML = await getAll(search.value === ''?null : search.value);
         }else if(value === 'credit'){
-            document.querySelector('#data').innerHTML = await getRow('credit', search.value);
+            document.querySelector('#data').innerHTML = await getRow('credit', search.value === ''? null: search.value);
         }else if(value === 'debit'){
-            document.querySelector('#data').innerHTML = await getRow('credit', search.value);
+            document.querySelector('#data').innerHTML = await getRow('debit', search.value === ''? null: search.value);
         }
     });
     const printbtn = document.querySelector('#printbtn');
@@ -655,51 +699,98 @@ const renderByDebit = ()=>{
 
     });
 };
+
 const getAll = async (date)=>{
     const thead = `
         <thead>
           <tr>
-              <th>SL No</th>
-              <th>Description</th>
-              <th>Quantity</th>
-              <th>Ammount</th>
-              <th>SL No</th>
-              <th>Description</th>
-              <th>Quantity</th>
-              <th>Ammount</th>
+              <th>ক্রমিক নং</th>
+              <th>জমা বিবরণী</th>
+              <th>পরিমাণ</th>
+              <th>ধরন</th>
+              <th>মূল্য</th>
+              <th>ক্রমিক নং</th>
+              <th>খরচ বিবরণী</th>
+              <th>পরিমাণ</th>
+              <th>ধরন</th>
+              <th>মূল্য</th>
           </tr>
         </thead> 
     `;
      let str = "";
      let str2 = "";
-     let p1 = 0, p2 = 0;
+     let p1 = 0, p2 = 0; let debitTotal = 0, creditTotal = 0;
     return new Promise((resolve, reject)=>{
         let sql;
-        if(isDateFormat(date)){
-            sql = `select * from accounts where date="${date}"`;
-        }else{
-            sql = `select institute.name, accounts.id, accounts.description, accounts.quantity, accounts.ammount, accounts.due, accounts.type, accounts.date from institute inner join accounts on institute.id=accounts.instid where institute.name like "%${date}%";`
+        let sdate = document.querySelector('#sdate');
+        if(date == null){
+            sql = `select * from accounts`;
         }
-       
+        else if(isDateFormat(date) && sdate.value === ''){
+            sql = `select * from accounts where date="${date}"`;
+        }else if(sdate.value !== ''){
+            sql = `select institute.name, accounts.id, accounts.description, accounts.quantity, accounts.ammount, accounts.due, accounts.type, accounts.date from institute inner join accounts on institute.id=accounts.instid where accounts.date="${sdate.value}" and institute.name like "%${date}%";`
+        }else{
+           sql = `select institute.name, accounts.id, accounts.description, accounts.quantity, accounts.ammount, accounts.due, accounts.type, accounts.date from institute inner join accounts on institute.id=accounts.instid where institute.name like "%${date}%";`
+        }
+        
         db.all(sql,[], (err, row)=>{
-            console.log(row);
             if(row){
                 const credits = row.filter(e=>e.type ==='credit');
                 const debits = row.filter(e=>e.type ==='debit');
                 for(let i = 0; i < Math.max(credits.length, debits.length); i++){
+                    // style="text-align: center;"
+                    creditTotal += credits[i] === undefined ? 0: credits[i].ammount === null ? 0 : credits[i].ammount;
+                    debitTotal += debits[i] === undefined ? 0: debits[i].ammount === null ? 0 : debits[i].ammount;
                     str+=`<tr>
-                        <td style="text-align: center;">${i+1}</td>
+                        <td>${i+1}</td>
                         <td style="word-wrap: break-word; max-width: 400px">${typeof debits[i] === 'undefined'? null: debits[i].description}</td>
-                        <td style="text-align: center;">${typeof debits[i] === 'undefined'? null: debits[i].quantity}</td>
-                        <td style="text-align: center;">${typeof debits[i] === 'undefined'? null:debits[i].ammount}</td>
-                        <td style="text-align: center;">${i+1}</td>
+                        <td >${typeof debits[i] === 'undefined'? null: debits[i].quantity}</td>
+                        <td>${typeof debits[i] === 'undefined'? null: debits[i].type === 'credit' ? "খরচ":"জমা"}</td>
+                        <td>${typeof debits[i] === 'undefined'? null:debits[i].ammount}</td>
+                        <td>${i+1}</td>
                         <td style="word-wrap: break-word; max-width: 300px">${typeof credits[i] === 'undefined'? null:credits[i].description}</td>
-                        <td style="text-align: center;">${typeof credits[i] === 'undefined'? null:credits[i].quantity}</td>
-                        <td style="text-align: center;">${typeof credits[i] === 'undefined'? null:credits[i].ammount}</td>
+                        <td>${typeof credits[i] === 'undefined'? null:credits[i].quantity}</td>
+                        <td>${typeof credits[i] === 'undefined'? null:credits[i].type === 'credit' ? "খরচ":"জমা"}</td>
+                        <td>${typeof credits[i] === 'undefined'? null:credits[i].ammount}</td>
                         </tr>
                             `;
                 }
-                
+                let remainingOrnot = true;
+                if(debitTotal - creditTotal < 0){
+                    remainingOrnot = false;
+                }else{
+                    remainingOrnot = true;
+                }
+                let calc = `
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>Total = ${debitTotal}</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>Total = ${creditTotal}</td>
+
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>অবশিষ্ট = ${remainingOrnot? Math.abs(debitTotal - creditTotal): 0}</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>বেশি খরচ = ${remainingOrnot? 0: Math.abs(debitTotal - creditTotal)}</td>
+
+                    </tr>
+                `;
+                str += calc;
             }
             const table = `
             <div class="row">
@@ -723,7 +814,7 @@ const getAll = async (date)=>{
 
 
 const isDateFormat = (str)=>{
-    let regex = new RegExp(/[0-9x]+-[0-9x]+-[0-9x]+/g);
+    let regex = new RegExp(/[0-9]+-[0-9x]+-[0-9x]+/g);
     let result = regex.exec(str);
     if(result){
         return true;
@@ -750,3 +841,63 @@ function printMe(query){
   },3000); // wait for images to load inside iframe
   window.focus();
  }
+
+
+const bntoEng = (engNumb)=>{
+    if(engNumb === null) return null;
+    let cengn = "";
+    const b2e = {
+        '১':'1',
+        '২':'2',
+        '৩':'3',
+        '৪':'4',
+        '৫':'5',
+        '৬':'6',
+        '৭':'7',
+        '৮':'8',
+        '৯':'9',
+        '০':'0',
+    };
+    for(let i = 0; i < engNumb.length; i++){
+        cengn += b2e[`${engNumb[i]}`];
+    }
+    return parseInt(cengn);
+};
+const isBengaliNumber = (bnumb)=>{
+    if(bnumb === null) return null;
+    let stat = true;
+    const barr = ['০', '১', '২','৩', '৪', '৫', '৬', '৭', '৮','৯'];
+    for(let i = 0; i < bnumb.length; i++){
+        if(barr.includes(bnumb[i]) === false){
+            stat = false;
+            return false;
+        }
+    }
+    return stat;
+
+}
+
+const BdateToEng = (date)=>{
+    if(isDateFormat(date)) return date;
+    let newDate = "";
+    const b2e = {
+        '১':'1',
+        '২':'2',
+        '৩':'3',
+        '৪':'4',
+        '৫':'5',
+        '৬':'6',
+        '৭':'7',
+        '৮':'8',
+        '৯':'9',
+        '০':'0',
+    };
+    for(let i= 0; i < date.length; i++){
+        if(date[i] === '-'){
+            newDate+= '-';
+        }else{
+            newDate += b2e[date[i]];
+        }
+    }
+    return newDate;
+}
